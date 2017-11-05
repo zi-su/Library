@@ -41,7 +41,9 @@ filelist = GetFileList(resourcePath)
 fileInfoList = list()
 hashlist = list()
 def MakeFileInfo(endian):
+    print(filelist)
     for i in filelist:
+        line = i
         i = i.replace('\\','/')
         fileSize = os.path.getsize(i)
         filename = os.path.basename(i)
@@ -51,6 +53,7 @@ def MakeFileInfo(endian):
         
         index = i.find('resource')
         filePath = i[index:len(i)]
+        filePath = filePath.replace("resource/", "")
         fileSizeBytes = fileSize.to_bytes(4, endian)
         print(i)
         print('FileSize:{0}'.format(fileSize))
@@ -59,7 +62,12 @@ def MakeFileInfo(endian):
         #同じハッシュ値が見つかったらアサート
         assert ret == False, 'Hash Hit file:{0} hash:{1}'.format(filePath, hashInt32)
         hashlist.append(hashInt32)
-        f.write('\t["filePath":"{0}", "fileSize":{1}, "hash":{2}],\n'.format(filePath, fileSize, hashInt32))
+        f.write('\t["filePath":"{0}", "fileSize":{1}, "hash":{2}]'.format(filePath, fileSize, hashInt32))
+        if line == filelist[-1]:
+            f.write("\n")
+        else:
+            f.write(",\n")
+
         if endian == 'little':
             fileinfo = FileInfoLittleEndian(filePath.encode('utf-8'), fileSize, hashInt32)
         else:
